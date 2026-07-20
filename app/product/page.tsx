@@ -2,6 +2,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
 import { deliceProduct } from "@/lib/productData";
+import { Check } from "lucide-react";
 
 export default function ProductPage() {
   const product = deliceProduct;
