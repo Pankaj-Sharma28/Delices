@@ -29,7 +29,7 @@ export default function Footer() {
               Home
             </Link>
             <Link href="/product" className="hover:text-warm-white transition-colors">
-              Buknu Spice
+              Delice Spice
             </Link>
             <Link href="/cart" className="hover:text-warm-white transition-colors">
               Shopping Cart
@@ -40,10 +40,10 @@ export default function Footer() {
         {/* Brand Promise / Digestion Column */}
         <div className="flex flex-col space-y-3 text-sm font-sans text-cream/70">
           <h4 className="font-serif text-sm tracking-wider text-muted-gold font-semibold uppercase text-cream">
-            The Buknu Promise
+            The Delice Promise
           </h4>
           <p>
-            Our Buknu digestive spice is made with 100% natural spices, zero preservatives, and traditional stone grinding. Handcrafted in small batches.
+            Our Delice digestive spice is made with 100% natural spices, zero preservatives, and traditional stone grinding. Handcrafted in small batches.
           </p>
           <span className="text-xs text-muted-gold mt-2 font-mono">
             © {new Date().getFullYear()} Delices. All rights reserved.

@@ -114,7 +114,7 @@ export default function CheckoutPage() {
         amount: orderData.amount,
         currency: orderData.currency,
         name: "Délices Artisan Spices",
-        description: "Buknu Ayurvedic Digestive Spice",
+        description: "Delice Ayurvedic Digestive Spice",
         order_id: orderData.orderId,
         prefill: {
           name: data.fullName,

@@ -44,7 +44,7 @@ export default function FeedbackSection() {
           animate={isInView ? { opacity: 1 } : {}}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
-          Your feedback helps us craft a better Buknu, batch after batch.
+          Your feedback helps us craft a better Delice, batch after batch.
         </motion.p>
 
         {submitted ? (
@@ -120,7 +120,7 @@ export default function FeedbackSection() {
                 value={form.message}
                 onChange={(e) => setForm({ ...form, message: e.target.value })}
                 className="w-full border border-brown/20 rounded-lg p-3 text-sm font-sans bg-white focus:outline-none focus:border-cinnamon resize-none"
-                placeholder="Tell us about your Buknu experience..."
+                placeholder="Tell us about your Delice experience..."
               />
             </div>
 

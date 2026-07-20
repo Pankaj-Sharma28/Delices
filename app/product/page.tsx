@@ -1,12 +1,10 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
-import { buknuProduct } from "@/lib/productData";
-import { Check } from "lucide-react";
-import Image from "next/image";
+import { deliceProduct } from "@/lib/productData";
 
 export default function ProductPage() {
-  const product = buknuProduct;
+  const product = deliceProduct;
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -53,7 +51,7 @@ export default function ProductPage() {
                 Kanpur Heritage Origin
               </h3>
               <p className="text-xs md:text-sm text-dark-coffee/75 leading-relaxed font-sans">
-                Buknu is a legacy spice blend hailing from Kanpur, Uttar Pradesh. Known for generations as a gut protector and digestion enhancer, it is toasted in small copper vats with cold-pressed mustard oil, unlocking natural healing properties of carom seeds, asafoetida, and dry ginger. Our blend keeps this Kanpur tradition alive with pure, source-verified local spices.
+                Delice is a legacy spice blend hailing from Kanpur, Uttar Pradesh. Known for generations as a gut protector and digestion enhancer, it is toasted in small copper vats with cold-pressed mustard oil, unlocking natural healing properties of carom seeds, asafoetida, and dry ginger. Our blend keeps this Kanpur tradition alive with pure, source-verified local spices.
               </p>
             </div>
           </div>

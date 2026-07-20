@@ -1,6 +1,7 @@
 "use client";
 
-import { motion } from "motion/react";
+import { motion, useScroll, useTransform, useMotionValue, useAnimationFrame } from "motion/react";
+import { useRef } from "react";
 import Image from "next/image";
 
 const ingredients = [
@@ -129,14 +130,38 @@ const ingredients = [
 
 const ITEM_WIDTH = 320;
 const GAP = 24;
-
-// Duplicate list for seamless infinite loop
-const loopedIngredients = [...ingredients, ...ingredients];
-
-// Total width of one full set of cards (to loop back seamlessly)
-const totalLoopWidth = ingredients.length * (ITEM_WIDTH + GAP);
+const AUTO_SPEED = 28; // pixels per second for slow auto-drift
 
 export default function IngredientsGallery() {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // ── Scroll-linked animation ──────────────────────────────
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end end"],
+  });
+  const totalDistance = (ingredients.length - 1) * (ITEM_WIDTH + GAP);
+  const scrollX = useTransform(scrollYProgress, [0, 1], [0, -totalDistance]);
+
+  // ── Auto-drift animation (loops every one card width) ────
+  const autoX = useMotionValue(0);
+  const driftRef = useRef(0);
+
+  useAnimationFrame((_, delta) => {
+    driftRef.current -= (delta / 1000) * AUTO_SPEED;
+    // Loop back every full card step so it feels seamless
+    if (driftRef.current < -(ITEM_WIDTH + GAP)) {
+      driftRef.current += ITEM_WIDTH + GAP;
+    }
+    autoX.set(driftRef.current);
+  });
+
+  // ── Combine: scroll position + continuous auto-drift ─────
+  const combinedX = useTransform(
+    [scrollX, autoX],
+    ([s, a]) => (s as number) + (a as number)
+  );
+
   return (
     <section id="ingredients" className="bg-dark-coffee py-0">
       {/* Section header */}
@@ -148,65 +173,64 @@ export default function IngredientsGallery() {
           12 Hand-Ground Ingredients
         </h2>
         <p className="text-sm text-warm-white/60 font-sans max-w-lg mx-auto">
-          Every herb that makes Buknu a potent digestive blend. Stone-ground in small batches to preserve every volatile healing oil.
+          Scroll to explore every herb that makes Delice a potent digestive blend. Stone-ground in small batches to preserve every volatile healing oil.
         </p>
+        <div className="text-warm-white/40 text-xs mt-4 font-sans flex items-center justify-center gap-2 animate-bounce">
+          <span>Scroll to explore</span>
+          <span>→</span>
+        </div>
       </div>
 
-      {/* Auto-scroll infinite carousel */}
-      <div className="overflow-hidden pb-20">
-        <motion.div
-          className="flex"
-          animate={{ x: [0, -totalLoopWidth] }}
-          transition={{
-            duration: 45,
-            ease: "linear",
-            repeat: Infinity,
-            repeatType: "loop",
-          }}
-          style={{ gap: GAP, paddingLeft: "5vw", willChange: "transform" }}
-        >
-          {loopedIngredients.map((item, index) => (
-            <div
-              key={`${item.id}-${index}`}
-              className="flex-shrink-0 rounded-2xl overflow-hidden relative"
-              style={{ width: ITEM_WIDTH, height: 460, backgroundColor: item.color }}
-            >
-              {/* Real image */}
-              {item.hasImage && item.image && (
-                <Image
-                  src={item.image}
-                  alt={item.name}
-                  fill
-                  className="object-cover opacity-60"
-                  sizes="320px"
-                />
-              )}
+      {/* Horizontal scroll container — drives scroll-linked x */}
+      <div ref={containerRef} style={{ height: `${ingredients.length * 120}vh` }} className="relative">
+        <div className="sticky top-0 h-screen flex items-center overflow-hidden">
+          <motion.div
+            className="flex"
+            style={{ x: combinedX, gap: GAP, paddingLeft: "10vw", willChange: "transform" }}
+          >
+            {ingredients.map((item) => (
+              <div
+                key={item.id}
+                className="flex-shrink-0 rounded-2xl overflow-hidden relative"
+                style={{ width: ITEM_WIDTH, height: 460, backgroundColor: item.color }}
+              >
+                {/* Real image or gradient background */}
+                {item.hasImage && item.image ? (
+                  <Image
+                    src={item.image}
+                    alt={item.name}
+                    fill
+                    className="object-cover opacity-60"
+                    sizes="320px"
+                  />
+                ) : null}
 
-              {/* Dark gradient overlay for text legibility */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                {/* Dark gradient overlay for text legibility */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
 
-              {/* Number */}
-              <div className="absolute top-8 left-8 font-mono text-xs text-white/50 tracking-widest z-10">
-                {String(item.id).padStart(2, "0")} / {String(ingredients.length).padStart(2, "0")}
-              </div>
+                {/* Number */}
+                <div className="absolute top-8 left-8 font-mono text-xs text-white/50 tracking-widest z-10">
+                  {String(item.id).padStart(2, "0")} / {String(ingredients.length).padStart(2, "0")}
+                </div>
 
-              {/* Content */}
-              <div className="absolute bottom-8 left-8 right-8 z-10">
-                <p className="text-white/60 text-xs font-sans mb-1 tracking-wider">{item.origin}</p>
-                <h3 className="font-serif text-2xl text-white font-bold mb-1">{item.name}</h3>
-                <p className="text-white/60 text-xs font-sans mb-4">{item.hindi}</p>
+                {/* Content */}
+                <div className="absolute bottom-8 left-8 right-8 z-10">
+                  <p className="text-white/60 text-xs font-sans mb-1 tracking-wider">{item.origin}</p>
+                  <h3 className="font-serif text-2xl text-white font-bold mb-1">{item.name}</h3>
+                  <p className="text-white/60 text-xs font-sans mb-4">{item.hindi}</p>
 
-                <div className="space-y-2 border-t border-white/20 pt-4">
-                  <div className="flex justify-between text-xs font-sans">
-                    <span className="text-white/50">Flavor</span>
-                    <span className="text-white font-semibold">{item.flavor}</span>
+                  <div className="space-y-2 border-t border-white/20 pt-4">
+                    <div className="flex justify-between text-xs font-sans">
+                      <span className="text-white/50">Flavor</span>
+                      <span className="text-white font-semibold">{item.flavor}</span>
+                    </div>
+                    <p className="text-white/80 text-xs font-sans leading-relaxed">{item.benefit}</p>
                   </div>
-                  <p className="text-white/80 text-xs font-sans leading-relaxed">{item.benefit}</p>
                 </div>
               </div>
-            </div>
-          ))}
-        </motion.div>
+            ))}
+          </motion.div>
+        </div>
       </div>
     </section>
   );

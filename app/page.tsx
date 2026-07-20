@@ -9,7 +9,8 @@ import ContactSection from "@/components/ContactSection";
 import FeedbackSection from "@/components/FeedbackSection";
 import Image from "next/image";
 import Link from "next/link";
-import { buknuProduct } from "@/lib/productData";
+import IngredientsMarquee from "@/components/IngredientsMarquee";
+import { deliceProduct } from "@/lib/productData";
 import { formatPrice } from "@/lib/utils";
 import { ArrowRight, Check } from "lucide-react";
 
@@ -38,7 +39,7 @@ function FloatingSpiceBadge() {
 }
 
 export default function Home() {
-  const product = buknuProduct;
+  const product = deliceProduct;
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -84,7 +85,7 @@ export default function Home() {
                   href="/product"
                   className="bg-brown hover:bg-dark-coffee text-cream px-8 py-4 rounded-xl text-sm font-semibold tracking-wide transition-colors flex items-center justify-center gap-2 font-sans shadow-sm"
                 >
-                  <span>Shop Buknu</span>
+                  <span>Shop Delice</span>
                   <ArrowRight className="w-4 h-4" />
                 </Link>
                 <Link
@@ -122,8 +123,8 @@ export default function Home() {
                 <div className="relative w-56 h-56 md:w-72 md:h-72 rounded-full overflow-hidden border-4 border-brown/15 shadow-2xl bg-ivory flex items-center justify-center">
                   <div className="relative w-48 h-48 md:w-64 md:h-64">
                     <Image
-                      src="/images/logo.png"
-                      alt="Delices Artisan Spices logo"
+                      src="/images/delice-logo.png"
+                      alt="Delice Artisan Spices logo"
                       fill
                       className="object-contain"
                       sizes="(max-width: 768px) 192px, 256px"
@@ -177,6 +178,11 @@ export default function Home() {
         <IngredientsGallery />
 
         {/* ═══════════════════════════════════════════════════════
+            DUAL-DIRECTION INGREDIENTS MARQUEE
+        ═══════════════════════════════════════════════════════ */}
+        <IngredientsMarquee />
+
+        {/* ═══════════════════════════════════════════════════════
             FEATURED PRODUCT SHOWCASE
         ═══════════════════════════════════════════════════════ */}
         <section className="py-20 px-6 max-w-7xl mx-auto w-full">
@@ -198,7 +204,7 @@ export default function Home() {
               >
                 <div className="relative w-full h-40 bg-warm-white rounded-xl overflow-hidden">
                   <Image
-                    src="/images/buknu-top.jpg"
+                    src="/images/delice-logo.png"
                     alt={v.name}
                     fill
                     className="object-cover rounded-xl group-hover:scale-105 transition-transform duration-500"

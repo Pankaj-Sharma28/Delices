@@ -28,8 +28,8 @@ export default function Navbar() {
         <Link href="/" className="flex items-center gap-3 group">
           <div className="relative w-10 h-10 md:w-12 md:h-12 flex-shrink-0">
             <Image
-              src="/images/logo.png"
-              alt="Délices Artisan Spices logo"
+              src="/images/delice-logo.png"
+              alt="Delice Artisan Spices logo"
               fill
               className="object-contain"
               sizes="48px"
@@ -51,7 +51,7 @@ export default function Navbar() {
           <Link href="/" className="hover:text-cinnamon transition-colors">Home</Link>
           <Link href="/#about" className="hover:text-cinnamon transition-colors">About</Link>
           <Link href="/#ingredients" className="hover:text-cinnamon transition-colors">Ingredients</Link>
-          <Link href="/product" className="hover:text-cinnamon transition-colors">Buy Buknu</Link>
+          <Link href="/product" className="hover:text-cinnamon transition-colors">Buy Delice</Link>
           <Link href="/#contact" className="hover:text-cinnamon transition-colors">Contact</Link>
         </div>
 
@@ -68,7 +68,7 @@ export default function Navbar() {
           </a>
 
           <a
-            href="https://wa.me/917428258845?text=Hi%20Delices!%20I%27d%20like%20to%20order%20Buknu."
+            href="https://wa.me/917428258845?text=Hi%20Delices!%20I%27d%20like%20to%20order%20Delice."
             target="_blank"
             rel="noopener noreferrer"
             className="hidden md:block text-brown hover:text-green-600 transition-colors"
@@ -102,7 +102,7 @@ export default function Navbar() {
           <Link href="/" onClick={() => setIsOpen(false)} className="hover:text-cinnamon transition-colors">Home</Link>
           <Link href="/#about" onClick={() => setIsOpen(false)} className="hover:text-cinnamon transition-colors">About</Link>
           <Link href="/#ingredients" onClick={() => setIsOpen(false)} className="hover:text-cinnamon transition-colors">Ingredients</Link>
-          <Link href="/product" onClick={() => setIsOpen(false)} className="hover:text-cinnamon transition-colors">Buy Buknu</Link>
+          <Link href="/product" onClick={() => setIsOpen(false)} className="hover:text-cinnamon transition-colors">Buy Delice</Link>
           <Link href="/#contact" onClick={() => setIsOpen(false)} className="hover:text-cinnamon transition-colors">Contact</Link>
           <div className="flex items-center gap-4 pt-2">
             <a href="https://instagram.com/delices.artisanspices" target="_blank" rel="noopener noreferrer" className="text-pink-600 flex items-center gap-1.5 text-xs">

@@ -45,7 +45,7 @@ export default function CartPage() {
               href="/product"
               className="bg-cinnamon hover:bg-terracotta text-white px-6 py-2.5 rounded-xl text-sm font-semibold transition-colors font-sans"
             >
-              Shop Buknu Spice
+              Shop Delice Spice
             </Link>
           </div>
         ) : (

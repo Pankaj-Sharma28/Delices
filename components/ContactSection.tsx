@@ -31,7 +31,7 @@ export default function ContactSection() {
       value: PHONE,
       sub: "Mon – Sat · 9am to 6pm IST",
       color: "bg-green-50 text-green-700 border-green-100",
-      href: `https://wa.me/${WHATSAPP_NUMBER}?text=Hi%20Delices!%20I'd%20like%20to%20order%20Buknu.`,
+      href: `https://wa.me/${WHATSAPP_NUMBER}?text=Hi%20Delices!%20I'd%20like%20to%20order%20Delice.`,
     },
     {
       icon: <InstagramIcon className="w-5 h-5" />,

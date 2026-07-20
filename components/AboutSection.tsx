@@ -9,12 +9,12 @@ const timeline = [
   {
     year: "Ancient",
     title: "Vedic Origins",
-    description: "Buknu's roots trace back to Ayurvedic texts where combinations of spices were prescribed as digestive aids for warriors and scholars.",
+    description: "Delice's roots trace back to Ayurvedic texts where combinations of spices were prescribed as digestive aids for warriors and scholars.",
   },
   {
     year: "500+ yrs",
     title: "Kanpur Tradition",
-    description: "Local families in Kanpur, Uttar Pradesh developed their own Buknu formulas, passed down through generations in clay pots and copper vessels.",
+    description: "Local families in Kanpur, Uttar Pradesh developed their own Delice formulas, passed down through generations in clay pots and copper vessels.",
   },
   {
     year: "Today",
@@ -55,7 +55,7 @@ export default function AboutSection() {
         animate={isInView ? { opacity: 1, y: 0 } : {}}
         transition={{ duration: 0.6, delay: 0.2 }}
       >
-        Delices was born from a desire to preserve Kanpur&apos;s most treasured digestive spice blend. Buknu has been our city&apos;s gut-health secret for centuries — we&apos;ve simply made it easier to enjoy every day.
+        Delices was born from a desire to preserve Kanpur&apos;s most treasured digestive spice blend. Delice has been our city&apos;s gut-health secret for centuries — we&apos;ve simply made it easier to enjoy every day.
       </motion.p>
 
       {/* Two column layout */}
@@ -69,7 +69,7 @@ export default function AboutSection() {
         >
           <Image
             src="/images/buknu-jar.jpg"
-            alt="Delices Buknu artisan spice jar"
+            alt="Delice artisan spice jar"
             fill
             className="object-cover"
             sizes="(max-width: 1024px) 100vw, 50vw"
@@ -109,7 +109,7 @@ export default function AboutSection() {
           transition={{ duration: 0.7, delay: 0.3 }}
         >
           <p className="text-dark-coffee/85 font-sans text-sm md:text-base leading-relaxed">
-            Buknu is not just a spice — it&apos;s a ritual. For generations, Kanpur families would sprinkle it on ghee-soaked parathas, on sliced raw mangoes, on curd, and on fresh salads. It became synonymous with the city&apos;s culinary identity.
+            Delice is not just a spice — it&apos;s a ritual. For generations, Kanpur families would sprinkle it on ghee-soaked parathas, on sliced raw mangoes, on curd, and on fresh salads. It became synonymous with the city&apos;s culinary identity.
           </p>
           <p className="text-dark-coffee/80 font-sans text-sm md:text-base leading-relaxed">
             At Delices, we source each of our 12 herbs directly from trusted UP and North India farmers. We stone-grind them in copper-lined vessels and toast the blend in cold-pressed mustard oil — the same method our grandmothers used. No shortcuts. No fillers.

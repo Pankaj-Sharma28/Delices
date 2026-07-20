@@ -15,7 +15,7 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Delices Artisan Spices | Premium Buknu",
+  title: "Delices Artisan Spices | Premium Delice",
   description: "Ayurvedic digestion and wellness spice blend — 12 herbs, stone-ground, small-batch crafted.",
 };
 
