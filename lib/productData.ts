@@ -25,7 +25,7 @@ export const deliceProduct: Product = {
     "Stimulates digestive enzymes to improve metabolic gut health",
     "Restores flavor balance with a traditional taste profile"
   ],
-  image: "/images/delice-logo.png",
+  image: "/images/buknu-jar.jpg",
   rating: 4.9,
   reviewsCount: 148,
   variants: [

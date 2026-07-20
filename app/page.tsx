@@ -9,7 +9,6 @@ import ContactSection from "@/components/ContactSection";
 import FeedbackSection from "@/components/FeedbackSection";
 import Image from "next/image";
 import Link from "next/link";
-import IngredientsMarquee from "@/components/IngredientsMarquee";
 import { deliceProduct } from "@/lib/productData";
 import { formatPrice } from "@/lib/utils";
 import { ArrowRight, Check } from "lucide-react";
@@ -172,15 +171,7 @@ export default function Home() {
         ═══════════════════════════════════════════════════════ */}
         <AboutSection />
 
-        {/* ═══════════════════════════════════════════════════════
-            INGREDIENTS HORIZONTAL SCROLL GALLERY
-        ═══════════════════════════════════════════════════════ */}
         <IngredientsGallery />
-
-        {/* ═══════════════════════════════════════════════════════
-            DUAL-DIRECTION INGREDIENTS MARQUEE
-        ═══════════════════════════════════════════════════════ */}
-        <IngredientsMarquee />
 
         {/* ═══════════════════════════════════════════════════════
             FEATURED PRODUCT SHOWCASE
@@ -204,7 +195,7 @@ export default function Home() {
               >
                 <div className="relative w-full h-40 bg-warm-white rounded-xl overflow-hidden">
                   <Image
-                    src="/images/delice-logo.png"
+                    src="/images/buknu-top.jpg"
                     alt={v.name}
                     fill
                     className="object-cover rounded-xl group-hover:scale-105 transition-transform duration-500"
