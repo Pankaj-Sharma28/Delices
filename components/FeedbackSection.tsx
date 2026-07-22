@@ -25,7 +25,6 @@ export interface Review {
   title: string;
   content: string;
   verified: boolean;
-  packPurchased: string;
   category: "digestion" | "taste" | "gifting" | "general";
   helpfulCount: number;
 }
@@ -41,7 +40,6 @@ const INITIAL_REVIEWS: Review[] = [
     content:
       "I suffer from chronic bloating after dinners. Ever since I started taking half a teaspoon of Delice after meals with warm water, my stomach feels so light. The mustard oil and sonth blend has an authentic flavor that you just can't find in mass-market digestive powders.",
     verified: true,
-    packPurchased: "250g Glass Jar Pack",
     category: "digestion",
     helpfulCount: 24,
   },
@@ -55,7 +53,6 @@ const INITIAL_REVIEWS: Review[] = [
     content:
       "As an Ayurvedic wellness practitioner, I scrutinize ingredients carefully. Delice uses genuine 12 therapeutic herbs like ajwain, hing, and dried ginger toasted in cold-pressed mustard oil. It improves Agni (digestive fire) naturally without any chemical fillers.",
     verified: true,
-    packPurchased: "500g Eco Pouch",
     category: "digestion",
     helpfulCount: 38,
   },
@@ -69,7 +66,6 @@ const INITIAL_REVIEWS: Review[] = [
     content:
       "Living away from Kanpur, I missed authentic Buknu for years. Delice tastes exactly like what my grandmother used to roast at home on wood stoves! We sprinkle it on warm ghee roti, dal rice, and even curd daily.",
     verified: true,
-    packPurchased: "1kg Family Pack",
     category: "taste",
     helpfulCount: 19,
   },
@@ -83,7 +79,6 @@ const INITIAL_REVIEWS: Review[] = [
     content:
       "Ordered the 250g Jar as a gift for my parents and ended up ordering two more for myself. The jar keeps the roasted spice aroma sealed fresh. Absolutely worth every rupee.",
     verified: true,
-    packPurchased: "250g Glass Jar Pack",
     category: "gifting",
     helpfulCount: 15,
   },
@@ -97,7 +92,6 @@ const INITIAL_REVIEWS: Review[] = [
     content:
       "I used to take antacid tablets regularly after rich meals. Switched to Delice 3 weeks ago on a friend's recommendation — no more acid reflux or heaviness. Clean, natural, and super effective.",
     verified: true,
-    packPurchased: "100g Trial Pouch",
     category: "digestion",
     helpfulCount: 29,
   },
@@ -111,7 +105,6 @@ const INITIAL_REVIEWS: Review[] = [
     content:
       "Not just digestive medicine, it's an incredible condiment! A dash on curd rice, stuffed parathas, or roasted makhana completely transforms the flavor profile. Essential for our pantry.",
     verified: true,
-    packPurchased: "500g Eco Pouch",
     category: "taste",
     helpfulCount: 12,
   },
@@ -140,7 +133,6 @@ export default function FeedbackSection() {
     location: "",
     title: "",
     content: "",
-    packPurchased: "250g Glass Jar Pack",
     category: "digestion" as Review["category"],
   });
 
@@ -181,7 +173,6 @@ export default function FeedbackSection() {
       location: rev.location,
       title: rev.title,
       content: rev.content,
-      packPurchased: rev.packPurchased,
       category: rev.category,
     });
     setShowForm(true);
@@ -230,7 +221,6 @@ export default function FeedbackSection() {
               rating: finalRating,
               title: finalTitle,
               content: finalContent,
-              packPurchased: form.packPurchased,
               category: form.category,
             }
           : r
@@ -251,7 +241,6 @@ export default function FeedbackSection() {
         title: finalTitle,
         content: finalContent,
         verified: true,
-        packPurchased: form.packPurchased,
         category: form.category,
         helpfulCount: 1,
       };
@@ -278,7 +267,6 @@ export default function FeedbackSection() {
         location: "",
         title: "",
         content: "",
-        packPurchased: "250g Glass Jar Pack",
         category: "digestion",
       });
     }, 2000);
@@ -395,7 +383,6 @@ export default function FeedbackSection() {
                   location: "",
                   title: "",
                   content: "",
-                  packPurchased: "250g Glass Jar Pack",
                   category: "digestion",
                 });
                 setShowForm(!showForm);
@@ -501,7 +488,7 @@ export default function FeedbackSection() {
                     </select>
                   </div>
 
-                  {/* Name (NO REQUIRED ATTRIBUTE) */}
+                  {/* Name */}
                   <div>
                     <label className="block text-xs font-bold uppercase tracking-wider text-dark-coffee/70 mb-1.5">
                       Your Name (Optional)
@@ -515,7 +502,7 @@ export default function FeedbackSection() {
                     />
                   </div>
 
-                  {/* Location (NO REQUIRED ATTRIBUTE) */}
+                  {/* Location */}
                   <div>
                     <label className="block text-xs font-bold uppercase tracking-wider text-dark-coffee/70 mb-1.5">
                       City / Location (Optional)
@@ -530,7 +517,7 @@ export default function FeedbackSection() {
                   </div>
                 </div>
 
-                {/* Review Headline (NO REQUIRED ATTRIBUTE) */}
+                {/* Review Headline */}
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-wider text-dark-coffee/70 mb-1.5">
                     Review Headline / Short Title (Optional)
@@ -544,7 +531,7 @@ export default function FeedbackSection() {
                   />
                 </div>
 
-                {/* Detailed Review (NO REQUIRED ATTRIBUTE) */}
+                {/* Detailed Review */}
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-wider text-dark-coffee/70 mb-1.5">
                     Detailed Review (Optional)
@@ -732,12 +719,8 @@ export default function FeedbackSection() {
                     </p>
                   </div>
 
-                  {/* Footer: Pack details & Helpful Button */}
-                  <div className="border-t border-brown/5 pt-4 mt-2 flex items-center justify-between text-xs font-sans">
-                    <span className="text-[11px] text-dark-coffee/60 bg-cream px-2.5 py-1 rounded-lg border border-brown/5">
-                      📦 {rev.packPurchased}
-                    </span>
-
+                  {/* Footer: Helpful Button */}
+                  <div className="border-t border-brown/5 pt-4 mt-2 flex items-center justify-end text-xs font-sans">
                     <button
                       onClick={() => handleHelpful(rev.id)}
                       className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border transition-all text-[11px] font-semibold ${
