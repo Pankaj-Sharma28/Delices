@@ -15,9 +15,9 @@ function InstagramIcon({ className }: { className?: string }) {
   );
 }
 
-const WHATSAPP_NUMBER = "917428258845";
+const WHATSAPP_NUMBER = "+91 85957 62068";
 const INSTAGRAM_URL = "https://instagram.com/delices.artisanspices"; // Replace with real Instagram handle
-const PHONE = "+91 74282 58845";
+const PHONE = "+91 85957 62068";
 const EMAIL = "hellop@thedelice.in";
 
 export default function ContactSection() {
