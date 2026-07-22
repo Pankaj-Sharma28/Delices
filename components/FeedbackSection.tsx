@@ -2,7 +2,19 @@
 
 import { motion, useInView } from "motion/react";
 import { useRef, useState, useEffect } from "react";
-import { Star, Send, CheckCircle, ThumbsUp, ShieldCheck, Filter, Search, PlusCircle, Sparkles } from "lucide-react";
+import {
+  Star,
+  Send,
+  CheckCircle,
+  ThumbsUp,
+  ShieldCheck,
+  Filter,
+  Search,
+  PlusCircle,
+  Sparkles,
+  Pencil,
+  Trash2,
+} from "lucide-react";
 
 export interface Review {
   id: string;
@@ -107,18 +119,22 @@ const INITIAL_REVIEWS: Review[] = [
 
 export default function FeedbackSection() {
   const ref = useRef<HTMLDivElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-60px" });
 
   const [reviews, setReviews] = useState<Review[]>(INITIAL_REVIEWS);
+  const [userReviewIds, setUserReviewIds] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [helpfulMap, setHelpfulMap] = useState<Record<string, boolean>>({});
 
   // Review Form State
   const [showForm, setShowForm] = useState(false);
+  const [editingReviewId, setEditingReviewId] = useState<string | null>(null);
   const [rating, setRating] = useState(5);
   const [hoveredRating, setHoveredRating] = useState(0);
   const [submitted, setSubmitted] = useState(false);
+
   const [form, setForm] = useState({
     name: "",
     location: "",
@@ -128,13 +144,15 @@ export default function FeedbackSection() {
     category: "digestion" as Review["category"],
   });
 
-  // Load reviews from localStorage on mount
+  // Load user reviews from localStorage on mount
   useEffect(() => {
     try {
       const stored = localStorage.getItem("delice_user_reviews");
       if (stored) {
-        const parsed = JSON.parse(stored);
+        const parsed: Review[] = JSON.parse(stored);
         if (Array.isArray(parsed) && parsed.length > 0) {
+          const ids = parsed.map((r) => r.id);
+          setUserReviewIds(ids);
           setReviews([...parsed, ...INITIAL_REVIEWS]);
         }
       }
@@ -142,6 +160,10 @@ export default function FeedbackSection() {
       // Ignore localStorage errors
     }
   }, []);
+
+  const isUserReview = (id: string) => {
+    return userReviewIds.includes(id) || id.startsWith("rev-user-");
+  };
 
   const handleHelpful = (id: string) => {
     if (helpfulMap[id]) return;
@@ -151,34 +173,97 @@ export default function FeedbackSection() {
     );
   };
 
+  const handleStartEdit = (rev: Review) => {
+    setEditingReviewId(rev.id);
+    setRating(rev.rating);
+    setForm({
+      name: rev.name,
+      location: rev.location,
+      title: rev.title,
+      content: rev.content,
+      packPurchased: rev.packPurchased,
+      category: rev.category,
+    });
+    setShowForm(true);
+
+    setTimeout(() => {
+      formRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 100);
+  };
+
+  const handleDeleteOwnReview = (id: string) => {
+    const updated = reviews.filter((r) => r.id !== id);
+    setReviews(updated);
+    const updatedIds = userReviewIds.filter((i) => i !== id);
+    setUserReviewIds(updatedIds);
+
+    try {
+      const userCreatedOnly = updated.filter((r) => isUserReview(r.id));
+      localStorage.setItem("delice_user_reviews", JSON.stringify(userCreatedOnly));
+    } catch {
+      // Ignore
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!rating || !form.name || !form.content || !form.title) return;
 
-    const newReview: Review = {
-      id: `rev-user-${Date.now()}`,
-      name: form.name,
-      location: form.location || "India",
-      rating,
-      date: new Date().toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-      }),
-      title: form.title,
-      content: form.content,
-      verified: true,
-      packPurchased: form.packPurchased,
-      category: form.category,
-      helpfulCount: 1,
-    };
+    // ALL FIELDS ARE OPTIONAL - provide default fallbacks if blank
+    const finalName = form.name.trim() || "Verified Customer";
+    const finalTitle = form.title.trim() || "Great Delice Experience";
+    const finalContent =
+      form.content.trim() ||
+      "Love the authentic taste, stone-ground texture, and natural digestive benefits of Delice Artisan Spices!";
+    const finalLocation = form.location.trim() || "India";
+    const finalRating = rating || 5;
 
-    const updated = [newReview, ...reviews];
-    setReviews(updated);
+    let updatedReviews: Review[] = [];
+
+    if (editingReviewId) {
+      // Editing existing review
+      updatedReviews = reviews.map((r) =>
+        r.id === editingReviewId
+          ? {
+              ...r,
+              name: finalName,
+              location: finalLocation,
+              rating: finalRating,
+              title: finalTitle,
+              content: finalContent,
+              packPurchased: form.packPurchased,
+              category: form.category,
+            }
+          : r
+      );
+    } else {
+      // Creating new review
+      const newId = `rev-user-${Date.now()}`;
+      const newReview: Review = {
+        id: newId,
+        name: finalName,
+        location: finalLocation,
+        rating: finalRating,
+        date: new Date().toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        }),
+        title: finalTitle,
+        content: finalContent,
+        verified: true,
+        packPurchased: form.packPurchased,
+        category: form.category,
+        helpfulCount: 1,
+      };
+      updatedReviews = [newReview, ...reviews];
+      setUserReviewIds((prev) => [...prev, newId]);
+    }
+
+    setReviews(updatedReviews);
     setSubmitted(true);
 
     try {
-      const userCreatedOnly = updated.filter((r) => r.id.startsWith("rev-user-"));
+      const userCreatedOnly = updatedReviews.filter((r) => isUserReview(r.id));
       localStorage.setItem("delice_user_reviews", JSON.stringify(userCreatedOnly));
     } catch {
       // Ignore
@@ -187,6 +272,7 @@ export default function FeedbackSection() {
     setTimeout(() => {
       setShowForm(false);
       setSubmitted(false);
+      setEditingReviewId(null);
       setForm({
         name: "",
         location: "",
@@ -195,7 +281,7 @@ export default function FeedbackSection() {
         packPurchased: "250g Glass Jar Pack",
         category: "digestion",
       });
-    }, 3000);
+    }, 2000);
   };
 
   // Filter reviews
@@ -302,7 +388,18 @@ export default function FeedbackSection() {
               Have you tried Delice?
             </span>
             <button
-              onClick={() => setShowForm(!showForm)}
+              onClick={() => {
+                setEditingReviewId(null);
+                setForm({
+                  name: "",
+                  location: "",
+                  title: "",
+                  content: "",
+                  packPurchased: "250g Glass Jar Pack",
+                  category: "digestion",
+                });
+                setShowForm(!showForm);
+              }}
               className="w-full bg-cinnamon hover:bg-terracotta text-white py-3 px-4 rounded-xl font-sans text-xs font-semibold tracking-wide transition-all shadow-sm flex items-center justify-center gap-2 hover:scale-[1.02]"
             >
               <PlusCircle className="w-4 h-4" />
@@ -311,7 +408,7 @@ export default function FeedbackSection() {
           </div>
         </motion.div>
 
-        {/* Dynamic Review Submission Form */}
+        {/* Dynamic Review Form (Add or Edit) */}
         {showForm && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
@@ -322,28 +419,43 @@ export default function FeedbackSection() {
             {submitted ? (
               <div className="bg-olive/10 border border-olive/20 rounded-3xl p-8 text-center flex flex-col items-center gap-3">
                 <CheckCircle className="w-12 h-12 text-olive" />
-                <h3 className="font-serif text-2xl text-brown font-bold">Thank You, {form.name}!</h3>
+                <h3 className="font-serif text-2xl text-brown font-bold">
+                  {editingReviewId ? "Review Updated!" : `Thank You, ${form.name || "Customer"}!`}
+                </h3>
                 <p className="text-sm text-dark-coffee/80 font-sans max-w-md">
-                  Your review has been verified and added to the live site reviews below. We deeply appreciate your support!
+                  {editingReviewId
+                    ? "Your changes have been saved to your review."
+                    : "Your review has been verified and added to the live site reviews below."}
                 </p>
               </div>
             ) : (
               <form
+                ref={formRef}
                 onSubmit={handleSubmit}
                 className="bg-warm-white border border-brown/20 rounded-3xl p-6 md:p-8 space-y-6 shadow-md"
               >
                 <div className="flex items-center justify-between border-b border-brown/10 pb-4">
                   <h3 className="font-serif text-xl text-brown font-bold flex items-center gap-2">
-                    <Star className="w-5 h-5 fill-mustard text-mustard" /> Share Your Experience
+                    {editingReviewId ? (
+                      <>
+                        <Pencil className="w-5 h-5 text-cinnamon" /> Edit Your Review
+                      </>
+                    ) : (
+                      <>
+                        <Star className="w-5 h-5 fill-mustard text-mustard" /> Share Your Experience
+                      </>
+                    )}
                   </h3>
-                  <span className="text-xs text-dark-coffee/60 font-sans">Public Customer Review</span>
+                  <span className="text-xs text-dark-coffee/60 font-sans">
+                    {editingReviewId ? "Updating Existing Review" : "All fields optional"}
+                  </span>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Rating Selector */}
                   <div>
                     <label className="block text-xs font-bold uppercase tracking-wider text-dark-coffee/70 mb-2">
-                      Your Rating *
+                      Rating (Optional)
                     </label>
                     <div className="flex items-center gap-2">
                       {[1, 2, 3, 4, 5].map((star) => (
@@ -373,7 +485,7 @@ export default function FeedbackSection() {
                   {/* Category */}
                   <div>
                     <label className="block text-xs font-bold uppercase tracking-wider text-dark-coffee/70 mb-2">
-                      Review Topic
+                      Review Topic (Optional)
                     </label>
                     <select
                       value={form.category}
@@ -389,14 +501,13 @@ export default function FeedbackSection() {
                     </select>
                   </div>
 
-                  {/* Name */}
+                  {/* Name (NO REQUIRED ATTRIBUTE) */}
                   <div>
                     <label className="block text-xs font-bold uppercase tracking-wider text-dark-coffee/70 mb-1.5">
-                      Your Name *
+                      Your Name (Optional)
                     </label>
                     <input
                       type="text"
-                      required
                       value={form.name}
                       onChange={(e) => setForm({ ...form, name: e.target.value })}
                       className="w-full border border-brown/20 rounded-xl p-3 text-xs font-sans bg-white focus:outline-none focus:border-cinnamon"
@@ -404,10 +515,10 @@ export default function FeedbackSection() {
                     />
                   </div>
 
-                  {/* Location */}
+                  {/* Location (NO REQUIRED ATTRIBUTE) */}
                   <div>
                     <label className="block text-xs font-bold uppercase tracking-wider text-dark-coffee/70 mb-1.5">
-                      City / Location
+                      City / Location (Optional)
                     </label>
                     <input
                       type="text"
@@ -419,14 +530,13 @@ export default function FeedbackSection() {
                   </div>
                 </div>
 
-                {/* Review Headline */}
+                {/* Review Headline (NO REQUIRED ATTRIBUTE) */}
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-wider text-dark-coffee/70 mb-1.5">
-                    Review Headline / Short Title *
+                    Review Headline / Short Title (Optional)
                   </label>
                   <input
                     type="text"
-                    required
                     value={form.title}
                     onChange={(e) => setForm({ ...form, title: e.target.value })}
                     className="w-full border border-brown/20 rounded-xl p-3 text-xs font-sans bg-white focus:outline-none focus:border-cinnamon"
@@ -434,13 +544,12 @@ export default function FeedbackSection() {
                   />
                 </div>
 
-                {/* Detailed Review */}
+                {/* Detailed Review (NO REQUIRED ATTRIBUTE) */}
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-wider text-dark-coffee/70 mb-1.5">
-                    Detailed Review *
+                    Detailed Review (Optional)
                   </label>
                   <textarea
-                    required
                     rows={4}
                     value={form.content}
                     onChange={(e) => setForm({ ...form, content: e.target.value })}
@@ -452,7 +561,10 @@ export default function FeedbackSection() {
                 <div className="flex justify-end gap-3 pt-2">
                   <button
                     type="button"
-                    onClick={() => setShowForm(false)}
+                    onClick={() => {
+                      setShowForm(false);
+                      setEditingReviewId(null);
+                    }}
                     className="px-5 py-3 rounded-xl border border-brown/20 text-xs font-sans font-semibold text-dark-coffee hover:bg-cream transition-colors"
                   >
                     Cancel
@@ -461,7 +573,8 @@ export default function FeedbackSection() {
                     type="submit"
                     className="px-7 py-3 rounded-xl bg-cinnamon hover:bg-terracotta text-white text-xs font-sans font-semibold tracking-wide transition-colors flex items-center gap-2 shadow-sm"
                   >
-                    <Send className="w-3.5 h-3.5" /> Submit Live Review
+                    <Send className="w-3.5 h-3.5" />
+                    {editingReviewId ? "Save Review Changes" : "Submit Live Review"}
                   </button>
                 </div>
               </form>
@@ -525,86 +638,121 @@ export default function FeedbackSection() {
               </button>
             </div>
           ) : (
-            filteredReviews.map((rev, index) => (
-              <motion.div
-                key={rev.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={isInView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.4, delay: 0.1 * (index % 6) }}
-                className="bg-warm-white border border-brown/10 rounded-3xl p-6 md:p-7 flex flex-col justify-between hover:shadow-md transition-shadow relative"
-              >
-                <div>
-                  {/* Top Row: User Avatar/Initials & Verified Badge */}
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-cinnamon/15 text-cinnamon font-serif font-bold text-sm flex items-center justify-center border border-cinnamon/20">
-                        {rev.name.charAt(0)}
+            filteredReviews.map((rev, index) => {
+              const isOwnReview = isUserReview(rev.id);
+
+              return (
+                <motion.div
+                  key={rev.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={isInView ? { opacity: 1, y: 0 } : {}}
+                  transition={{ duration: 0.4, delay: 0.1 * (index % 6) }}
+                  className={`bg-warm-white border rounded-3xl p-6 md:p-7 flex flex-col justify-between hover:shadow-md transition-all relative ${
+                    isOwnReview ? "border-cinnamon/40 ring-1 ring-cinnamon/20 bg-amber-50/30" : "border-brown/10"
+                  }`}
+                >
+                  <div>
+                    {/* Top Row: User Avatar/Initials & Verified / Author Badges */}
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-cinnamon/15 text-cinnamon font-serif font-bold text-sm flex items-center justify-center border border-cinnamon/20">
+                          {rev.name.charAt(0)}
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <h4 className="font-serif text-sm font-bold text-brown leading-none">
+                              {rev.name}
+                            </h4>
+                            {isOwnReview && (
+                              <span className="text-[9px] font-bold tracking-wide uppercase px-2 py-0.5 rounded bg-cinnamon text-white font-sans">
+                                Your Review
+                              </span>
+                            )}
+                          </div>
+                          <span className="text-[11px] text-dark-coffee/60 font-sans block mt-1">
+                            {rev.location}
+                          </span>
+                        </div>
                       </div>
-                      <div>
-                        <h4 className="font-serif text-sm font-bold text-brown leading-none mb-1">
-                          {rev.name}
-                        </h4>
-                        <span className="text-[11px] text-dark-coffee/60 font-sans block">
-                          {rev.location}
-                        </span>
+
+                      <div className="flex items-center gap-2">
+                        {rev.verified && (
+                          <span className="inline-flex items-center gap-1 text-[10px] font-bold text-olive bg-olive/10 border border-olive/20 px-2.5 py-1 rounded-full font-sans">
+                            <CheckCircle className="w-3 h-3" /> Verified
+                          </span>
+                        )}
+
+                        {/* EDIT BUTTON (Only for the author's own review) */}
+                        {isOwnReview && (
+                          <div className="flex items-center gap-1">
+                            <button
+                              onClick={() => handleStartEdit(rev)}
+                              className="inline-flex items-center gap-1 text-xs font-semibold text-cinnamon hover:text-terracotta bg-cinnamon/10 border border-cinnamon/20 px-2.5 py-1 rounded-full transition-colors font-sans"
+                              title="Edit your review"
+                            >
+                              <Pencil className="w-3 h-3" /> Edit
+                            </button>
+                            <button
+                              onClick={() => handleDeleteOwnReview(rev.id)}
+                              className="p-1 text-dark-coffee/40 hover:text-red-600 transition-colors"
+                              title="Delete review"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        )}
                       </div>
                     </div>
 
-                    {rev.verified && (
-                      <span className="inline-flex items-center gap-1 text-[10px] font-bold text-olive bg-olive/10 border border-olive/20 px-2.5 py-1 rounded-full font-sans">
-                        <CheckCircle className="w-3 h-3" /> Verified Buyer
+                    {/* Rating Stars & Date */}
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-1">
+                        {[...Array(5)].map((_, i) => (
+                          <Star
+                            key={i}
+                            className={`w-4 h-4 ${
+                              i < rev.rating
+                                ? "fill-mustard text-mustard"
+                                : "text-brown/20"
+                            }`}
+                          />
+                        ))}
+                      </div>
+                      <span className="text-[11px] font-sans text-dark-coffee/50">
+                        {rev.date}
                       </span>
-                    )}
-                  </div>
-
-                  {/* Rating Stars & Date */}
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-1">
-                      {[...Array(5)].map((_, i) => (
-                        <Star
-                          key={i}
-                          className={`w-4 h-4 ${
-                            i < rev.rating
-                              ? "fill-mustard text-mustard"
-                              : "text-brown/20"
-                          }`}
-                        />
-                      ))}
                     </div>
-                    <span className="text-[11px] font-sans text-dark-coffee/50">
-                      {rev.date}
-                    </span>
+
+                    {/* Title & Review Content */}
+                    <h5 className="font-serif text-base font-bold text-brown mb-2">
+                      "{rev.title}"
+                    </h5>
+                    <p className="text-xs md:text-sm text-dark-coffee/80 font-sans leading-relaxed mb-4">
+                      {rev.content}
+                    </p>
                   </div>
 
-                  {/* Title & Review Content */}
-                  <h5 className="font-serif text-base font-bold text-brown mb-2">
-                    "{rev.title}"
-                  </h5>
-                  <p className="text-xs md:text-sm text-dark-coffee/80 font-sans leading-relaxed mb-4">
-                    {rev.content}
-                  </p>
-                </div>
+                  {/* Footer: Pack details & Helpful Button */}
+                  <div className="border-t border-brown/5 pt-4 mt-2 flex items-center justify-between text-xs font-sans">
+                    <span className="text-[11px] text-dark-coffee/60 bg-cream px-2.5 py-1 rounded-lg border border-brown/5">
+                      📦 {rev.packPurchased}
+                    </span>
 
-                {/* Footer: Pack details & Helpful Button */}
-                <div className="border-t border-brown/5 pt-4 mt-2 flex items-center justify-between text-xs font-sans">
-                  <span className="text-[11px] text-dark-coffee/60 bg-cream px-2.5 py-1 rounded-lg border border-brown/5">
-                    📦 {rev.packPurchased}
-                  </span>
-
-                  <button
-                    onClick={() => handleHelpful(rev.id)}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border transition-all text-[11px] font-semibold ${
-                      helpfulMap[rev.id]
-                        ? "bg-olive/10 border-olive/30 text-olive"
-                        : "bg-white border-brown/15 text-dark-coffee/70 hover:border-cinnamon hover:text-cinnamon"
-                    }`}
-                  >
-                    <ThumbsUp className="w-3 h-3" />
-                    <span>Helpful ({rev.helpfulCount})</span>
-                  </button>
-                </div>
-              </motion.div>
-            ))
+                    <button
+                      onClick={() => handleHelpful(rev.id)}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border transition-all text-[11px] font-semibold ${
+                        helpfulMap[rev.id]
+                          ? "bg-olive/10 border-olive/30 text-olive"
+                          : "bg-white border-brown/15 text-dark-coffee/70 hover:border-cinnamon hover:text-cinnamon"
+                      }`}
+                    >
+                      <ThumbsUp className="w-3 h-3" />
+                      <span>Helpful ({rev.helpfulCount})</span>
+                    </button>
+                  </div>
+                </motion.div>
+              );
+            })
           )}
         </div>
       </div>
