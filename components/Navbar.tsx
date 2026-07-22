@@ -38,7 +38,7 @@ export default function Navbar() {
           </div>
           <div className="flex flex-col leading-none">
             <span className="font-serif text-sm md:text-base tracking-wider text-brown font-semibold group-hover:text-cinnamon transition-colors">
-              DELICES
+              DELICE
             </span>
             <span className="text-[9px] tracking-[0.2em] text-cinnamon font-sans uppercase">
               Artisan Spices
@@ -65,7 +65,7 @@ export default function Navbar() {
             className="hidden md:block text-brown hover:text-pink-600 transition-colors"
             aria-label="Instagram"
           >
-          <InstagramIcon className="w-4 h-4" />
+            <InstagramIcon className="w-4 h-4" />
           </a>
 
           <a

@@ -55,7 +55,7 @@ export default function Footer() {
             href="mailto:hello@thedelice.in"
             className="text-cinnamon-light hover:text-white font-medium underline transition-colors text-xs"
           >
-            hellop@thedelice.in
+            hello@thedelice.in
           </a>
           <span className="text-xs text-muted-gold mt-2 font-mono">
             © {new Date().getFullYear()} Delices. All rights reserved.

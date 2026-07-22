@@ -64,18 +64,39 @@ export default function CheckoutPage() {
 
   const selectedPayment = watch("paymentMethod");
 
-  const finalizeOrder = (data: CheckoutFormValues) => {
-    dispatch(saveShippingAddress({
-      fullName: data.fullName,
-      email: data.email,
-      phone: data.phone,
-      addressLine1: data.addressLine1,
-      addressLine2: data.addressLine2,
-      city: data.city,
-      state: data.state,
-      postalCode: data.postalCode,
-      country: data.country,
-    }));
+  const finalizeOrder = async (data: CheckoutFormValues) => {
+    const generatedOrderNumber = `DEL-${Math.floor(100000 + Math.random() * 900000)}`;
+
+    const orderPayload = {
+      orderNumber: generatedOrderNumber,
+      items: cartItems,
+      totalAmount,
+      shippingAddress: {
+        fullName: data.fullName,
+        email: data.email,
+        phone: data.phone,
+        addressLine1: data.addressLine1,
+        addressLine2: data.addressLine2,
+        city: data.city,
+        state: data.state,
+        postalCode: data.postalCode,
+        country: data.country,
+      },
+      paymentMethod: data.paymentMethod,
+      createdAt: new Date().toISOString(),
+    };
+
+    try {
+      await fetch("/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(orderPayload),
+      });
+    } catch (err) {
+      console.error("Failed to sync order to server:", err);
+    }
+
+    dispatch(saveShippingAddress(orderPayload.shippingAddress));
     dispatch(completeCheckout());
     dispatch(clearCart());
     router.push("/order-confirmation");
