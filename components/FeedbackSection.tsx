@@ -136,8 +136,9 @@ export default function FeedbackSection() {
     category: "digestion" as Review["category"],
   });
 
-  // Load user reviews from localStorage on mount
+  // Load user review ownership from localStorage on mount & fetch server reviews
   useEffect(() => {
+    // 1. Restore local ownership IDs
     try {
       const stored = localStorage.getItem("delice_user_reviews");
       if (stored) {
@@ -145,12 +146,29 @@ export default function FeedbackSection() {
         if (Array.isArray(parsed) && parsed.length > 0) {
           const ids = parsed.map((r) => r.id);
           setUserReviewIds(ids);
-          setReviews([...parsed, ...INITIAL_REVIEWS]);
         }
       }
-    } catch {
-      // Ignore localStorage errors
+    } catch {}
+
+    // 2. Fetch server-synced public reviews from /api/reviews
+    async function loadServerReviews() {
+      try {
+        const res = await fetch("/api/reviews");
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data.reviews) && data.reviews.length > 0) {
+            // Combine server reviews with base seed reviews, avoiding duplicates
+            const serverIds = new Set(data.reviews.map((r: Review) => r.id));
+            const baseNotCovered = INITIAL_REVIEWS.filter((r) => !serverIds.has(r.id));
+            setReviews([...data.reviews, ...baseNotCovered]);
+          }
+        }
+      } catch (e) {
+        console.error("Failed to load server reviews:", e);
+      }
     }
+
+    loadServerReviews();
   }, []);
 
   const isUserReview = (id: string) => {
@@ -182,7 +200,7 @@ export default function FeedbackSection() {
     }, 100);
   };
 
-  const handleDeleteOwnReview = (id: string) => {
+  const handleDeleteOwnReview = async (id: string) => {
     const updated = reviews.filter((r) => r.id !== id);
     setReviews(updated);
     const updatedIds = userReviewIds.filter((i) => i !== id);
@@ -191,15 +209,18 @@ export default function FeedbackSection() {
     try {
       const userCreatedOnly = updated.filter((r) => isUserReview(r.id));
       localStorage.setItem("delice_user_reviews", JSON.stringify(userCreatedOnly));
-    } catch {
-      // Ignore
-    }
+      // Delete on server as well
+      await fetch("/api/reviews", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "delete", id }),
+      });
+    } catch {}
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // ALL FIELDS ARE OPTIONAL - provide default fallbacks if blank
     const finalName = form.name.trim() || "Verified Customer";
     const finalTitle = form.title.trim() || "Great Delice Experience";
     const finalContent =
@@ -208,27 +229,29 @@ export default function FeedbackSection() {
     const finalLocation = form.location.trim() || "India";
     const finalRating = rating || 5;
 
+    let targetReview: Review;
     let updatedReviews: Review[] = [];
 
     if (editingReviewId) {
       // Editing existing review
-      updatedReviews = reviews.map((r) =>
-        r.id === editingReviewId
-          ? {
-              ...r,
-              name: finalName,
-              location: finalLocation,
-              rating: finalRating,
-              title: finalTitle,
-              content: finalContent,
-              category: form.category,
-            }
-          : r
-      );
+      const existing = reviews.find((r) => r.id === editingReviewId);
+      targetReview = {
+        id: editingReviewId,
+        name: finalName,
+        location: finalLocation,
+        rating: finalRating,
+        date: existing?.date || new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
+        title: finalTitle,
+        content: finalContent,
+        verified: true,
+        category: form.category,
+        helpfulCount: existing?.helpfulCount || 1,
+      };
+      updatedReviews = reviews.map((r) => (r.id === editingReviewId ? targetReview : r));
     } else {
       // Creating new review
       const newId = `rev-user-${Date.now()}`;
-      const newReview: Review = {
+      targetReview = {
         id: newId,
         name: finalName,
         location: finalLocation,
@@ -244,18 +267,28 @@ export default function FeedbackSection() {
         category: form.category,
         helpfulCount: 1,
       };
-      updatedReviews = [newReview, ...reviews];
+      updatedReviews = [targetReview, ...reviews];
       setUserReviewIds((prev) => [...prev, newId]);
     }
 
     setReviews(updatedReviews);
     setSubmitted(true);
 
+    // Save locally
     try {
       const userCreatedOnly = updatedReviews.filter((r) => isUserReview(r.id));
       localStorage.setItem("delice_user_reviews", JSON.stringify(userCreatedOnly));
-    } catch {
-      // Ignore
+    } catch {}
+
+    // Save to backend server API so it displays across ALL devices & browsers!
+    try {
+      await fetch("/api/reviews", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ review: targetReview }),
+      });
+    } catch (err) {
+      console.error("Failed to sync review to server:", err);
     }
 
     setTimeout(() => {
@@ -411,8 +444,8 @@ export default function FeedbackSection() {
                 </h3>
                 <p className="text-sm text-dark-coffee/80 font-sans max-w-md">
                   {editingReviewId
-                    ? "Your changes have been saved to your review."
-                    : "Your review has been verified and added to the live site reviews below."}
+                    ? "Your changes have been saved and published across all devices."
+                    : "Your review has been verified and published live to all devices."}
                 </p>
               </div>
             ) : (
