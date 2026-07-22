@@ -18,7 +18,7 @@ function InstagramIcon({ className }: { className?: string }) {
 const WHATSAPP_NUMBER = "917428258845";
 const INSTAGRAM_URL = "https://instagram.com/delices.artisanspices"; // Replace with real Instagram handle
 const PHONE = "+91 74282 58845";
-const EMAIL = "hello@delicesartisanspices.com"; // Replace with real email
+const EMAIL = "hello@thedelice.in";
 
 export default function ContactSection() {
   const ref = useRef<HTMLDivElement>(null);

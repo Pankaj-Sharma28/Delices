@@ -51,6 +51,7 @@ export default function Navbar() {
           <Link href="/" className="hover:text-cinnamon transition-colors">Home</Link>
           <Link href="/#about" className="hover:text-cinnamon transition-colors">About</Link>
           <Link href="/#ingredients" className="hover:text-cinnamon transition-colors">Ingredients</Link>
+          <Link href="/#reviews" className="hover:text-cinnamon transition-colors">Reviews</Link>
           <Link href="/product" className="hover:text-cinnamon transition-colors">Buy Delice</Link>
           <Link href="/#contact" className="hover:text-cinnamon transition-colors">Contact</Link>
         </div>
@@ -102,6 +103,7 @@ export default function Navbar() {
           <Link href="/" onClick={() => setIsOpen(false)} className="hover:text-cinnamon transition-colors">Home</Link>
           <Link href="/#about" onClick={() => setIsOpen(false)} className="hover:text-cinnamon transition-colors">About</Link>
           <Link href="/#ingredients" onClick={() => setIsOpen(false)} className="hover:text-cinnamon transition-colors">Ingredients</Link>
+          <Link href="/#reviews" onClick={() => setIsOpen(false)} className="hover:text-cinnamon transition-colors">Reviews</Link>
           <Link href="/product" onClick={() => setIsOpen(false)} className="hover:text-cinnamon transition-colors">Buy Delice</Link>
           <Link href="/#contact" onClick={() => setIsOpen(false)} className="hover:text-cinnamon transition-colors">Contact</Link>
           <div className="flex items-center gap-4 pt-2">

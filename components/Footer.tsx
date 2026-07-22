@@ -31,20 +31,32 @@ export default function Footer() {
             <Link href="/product" className="hover:text-warm-white transition-colors">
               Delice Spice
             </Link>
+            <Link href="/#reviews" className="hover:text-warm-white transition-colors">
+              Customer Reviews
+            </Link>
             <Link href="/cart" className="hover:text-warm-white transition-colors">
               Shopping Cart
+            </Link>
+            <Link href="/#contact" className="hover:text-warm-white transition-colors">
+              Contact Us
             </Link>
           </div>
         </div>
 
-        {/* Brand Promise / Digestion Column */}
+        {/* Brand Promise & Contact Info Column */}
         <div className="flex flex-col space-y-3 text-sm font-sans text-cream/70">
           <h4 className="font-serif text-sm tracking-wider text-muted-gold font-semibold uppercase text-cream">
-            The Delice Promise
+            Contact & Support
           </h4>
           <p>
-            Our Delice digestive spice is made with 100% natural spices, zero preservatives, and traditional stone grinding. Handcrafted in small batches.
+            Questions, bulk orders or feedback? Reach out to us anytime:
           </p>
+          <a
+            href="mailto:hello@thedelice.in"
+            className="text-cinnamon-light hover:text-white font-medium underline transition-colors text-xs"
+          >
+            hello@thedelice.in
+          </a>
           <span className="text-xs text-muted-gold mt-2 font-mono">
             © {new Date().getFullYear()} Delices. All rights reserved.
           </span>

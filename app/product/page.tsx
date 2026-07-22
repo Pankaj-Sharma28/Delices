@@ -1,6 +1,7 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
+import FeedbackSection from "@/components/FeedbackSection";
 import { deliceProduct } from "@/lib/productData";
 import { Check } from "lucide-react";
 
@@ -87,6 +88,11 @@ export default function ProductPage() {
             </div>
           </div>
 
+        </div>
+
+        {/* Real Customer Reviews Section */}
+        <div className="mt-16">
+          <FeedbackSection />
         </div>
       </main>
 
