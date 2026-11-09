@@ -1,0 +1,33 @@
+[
+  {
+    "id": "ORD-1794237960916",
+    "orderNumber": "DEL-549725",
+    "items": [
+      {
+        "id": "delice",
+        "variantId": "delice-50g",
+        "name": "Artisan Ayurvedic Delice",
+        "variantName": "Single Jar (50g)",
+        "price": 80,
+        "weight": "50g",
+        "image": "/images/buknu-jar.jpg",
+        "quantity": 1
+      }
+    ],
+    "totalAmount": 80,
+    "paymentMethod": "cod",
+    "status": "COD - Pending Dispatch",
+    "shippingAddress": {
+      "fullName": "Pankaj Sharma",
+      "email": "sohampandit8277@gmail.com",
+      "phone": "7617418277",
+      "addressLine1": "Block C-570 Nand Gram Ghaziabad",
+      "addressLine2": "",
+      "city": "Ghaziabad",
+      "state": "Uttar Pradesh",
+      "postalCode": "201003",
+      "country": "India"
+    },
+    "createdAt": "2026-11-09T15:25:57.551Z"
+  }
+]

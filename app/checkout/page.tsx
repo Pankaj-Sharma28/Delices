@@ -115,16 +115,21 @@ export default function CheckoutPage() {
         return;
       }
 
-      // Step 2: Create Razorpay order on server
-      const res = await fetch("/api/razorpay/create-order", {
+      // Step 2: Create Razorpay order on server (amount in paise, min 100 paise)
+      const res = await fetch("/api/create-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount: totalAmount }),
+        body: JSON.stringify({
+          amount: Math.round(totalAmount * 100),
+          currency: "INR",
+          receipt: `receipt_${Date.now()}`,
+        }),
       });
       const orderData = await res.json();
 
-      if (!res.ok || !orderData.orderId) {
-        setPaymentError(orderData.error || "Failed to create payment order. Use COD instead.");
+      const orderId = orderData.order_id || orderData.orderId;
+      if (!res.ok || !orderId) {
+        setPaymentError(orderData.error || "Failed to create payment order. Please try again.");
         setIsProcessing(false);
         return;
       }
@@ -133,10 +138,10 @@ export default function CheckoutPage() {
       const options = {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         amount: orderData.amount,
-        currency: orderData.currency,
+        currency: orderData.currency || "INR",
         name: "Délices Artisan Spices",
         description: "Delice Ayurvedic Digestive Spice",
-        order_id: orderData.orderId,
+        order_id: orderId,
         prefill: {
           name: data.fullName,
           email: data.email,
@@ -144,31 +149,40 @@ export default function CheckoutPage() {
         },
         theme: { color: "#A85C32" },
         handler: async (response: any) => {
-          // Step 4: Verify payment server-side
-          const verifyRes = await fetch("/api/razorpay/verify", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              razorpay_order_id: response.razorpay_order_id,
-              razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_signature: response.razorpay_signature,
-            }),
-          });
-          const verifyData = await verifyRes.json();
-          if (verifyData.success) {
-            finalizeOrder(data);
-          } else {
-            setPaymentError("Payment verification failed. Please contact support.");
+          // Step 4: Verify payment signature server-side
+          try {
+            const verifyRes = await fetch("/api/verify-payment", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+              }),
+            });
+            const verifyData = await verifyRes.json();
+            if (verifyRes.ok && verifyData.success) {
+              finalizeOrder({ ...data, paymentMethod: "razorpay" });
+            } else {
+              setPaymentError(verifyData.error || "Payment verification failed. Please contact support.");
+              setIsProcessing(false);
+            }
+          } catch {
+            setPaymentError("Payment verification network error. Please contact support.");
+            setIsProcessing(false);
           }
         },
         modal: {
-          ondismiss: () => setIsProcessing(false),
+          ondismiss: () => {
+            setIsProcessing(false);
+            setPaymentError("Payment cancelled by user.");
+          },
         },
       };
 
       const rzp = new (window as any).Razorpay(options);
       rzp.on("payment.failed", (response: any) => {
-        setPaymentError(`Payment failed: ${response.error.description}`);
+        setPaymentError(`Payment failed: ${response.error?.description || "Transaction failed"}`);
         setIsProcessing(false);
       });
       rzp.open();

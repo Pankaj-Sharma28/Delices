@@ -16,7 +16,7 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Delices Artisan Spices | Premium Delice",
+  title: "Delice Artisan Spices | Premium Delice",
   description: "Ayurvedic digestion and wellness spice blend — 12 herbs, stone-ground, small-batch crafted.",
 };
 
@@ -43,6 +43,11 @@ export default function RootLayout({
           gtag('config', 'G-T22XYV5G5V');
         `}
       </Script>
+      {/* Razorpay Standard Checkout Script */}
+      <Script
+        src="https://checkout.razorpay.com/v1/checkout.js"
+        strategy="lazyOnload"
+      />
       <body className="min-h-full flex flex-col bg-ivory text-dark-coffee">
         <Providers>
           <ScrollProgressBar />
